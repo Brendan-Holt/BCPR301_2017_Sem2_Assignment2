@@ -30,7 +30,7 @@ class Graph:
         if graph.type == 'pie':
             plt.pie(graph.data1, labels=graph.labels, colors=colours, startangle=90)
         # If the graph is a bar graph
-        elif graph.type == 'bar':
+        else:
             # Load additional information used in a bar graph
             if graph.option == 'salary-by-gender':
                 mx = [1, 3, 5, 7]
@@ -39,7 +39,7 @@ class Graph:
                 plt.bar(mx, graph.data1, color='blue')
                 plt.bar(wx, graph.data2, color='red')
                 plt.xticks(xl, graph.labels, rotation='vertical')
-            elif graph.option == 'salary-by-age':
+            else:
                 aa = [1, 6, 11, 16]
                 ab = [2, 7, 12, 17]
                 ac = [3, 8, 13, 18]
@@ -62,16 +62,10 @@ class Graph:
             # If new graph is none then create argss as regular else append args from create_graph
             argss.append(args[1][0])
             argss.append(args[1][1])
-            # Raises exception is wrong amount of args
-            if len(argss) > 2 or len(argss) < 2:
-                raise TypeError
             # Raised exception if args are typed incorrectly
             if argss[0] == 'pie' and argss[1] != 'gender' and argss[1] != 'bmi' and argss[1] != 'age' \
                     or argss[0] == 'bar' and argss[1] != 'salary-by-gender' and argss[1] != 'salary-by-age':
                 raise ValueError
-        except TypeError:
-            print('This functions takes exactly one parameters')
-            return
         except ValueError:
             print('Ensure Graph Value Option Parameter is correctly spelt')
             return
@@ -103,7 +97,7 @@ class Graph:
                 graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE BMI = 'Obesity'""")))
                 labels = ['Underweight', 'Normal', 'Overweight', 'Obese']
                 graphtitle = "Employees by BMI"
-            elif argss[1] == 'age':
+            else:
                 graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age < 25""")))
                 graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age BETWEEN 26 AND 40""")))
                 graphdata1.append(len(append_sql("""SELECT * FROM employee WHERE age BETWEEN 41 AND 50""")))
@@ -178,16 +172,3 @@ class Graph:
         new_graph.time = time.strftime(": Create at %H:%M - Date %d/%m/%y")
         # Return the graph
         return new_graph
-
-    def set_data(self, new_graph):
-        self.data1 = new_graph.data1
-        # NEW Brendan
-        self.data2 = new_graph.data2
-        self.data3 = new_graph.data3
-        self.data4 = new_graph.data4
-        self.title = new_graph.title
-        self.type = new_graph.type
-        self.option = new_graph.option
-        self.labels = new_graph.labels
-        self.angle = new_graph.angle
-        self.time = new_graph.time

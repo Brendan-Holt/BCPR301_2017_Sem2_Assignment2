@@ -23,9 +23,3 @@ class IFileHandler:
 
     @abstractmethod
     def pickle_all(self, data): raise NotImplementedError
-
-    @abstractmethod
-    def valid_date(self, data): raise NotImplementedError
-
-    @abstractmethod
-    def valid_age(self, data): raise NotImplementedError

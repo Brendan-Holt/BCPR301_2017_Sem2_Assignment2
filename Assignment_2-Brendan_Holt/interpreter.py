@@ -33,7 +33,7 @@ class Interpreter(Cmd):
             print("adding data")
             print(data_to_add)
             self.database.write_to_database(data_to_add)
-        elif len(args) == 2:
+        else:
             file_path = args[1]
             optn = args[0]
             if "-d" in optn:
@@ -63,10 +63,7 @@ class Interpreter(Cmd):
 
         print(can_create)
         if can_create:
-            if len(args) > 1:
-                self.file_handler.write_file(args[1], data)
-            else:
-                self.file_handler.write_file(args[0], data)
+            self.file_handler.write_file(args[1], data)
         else:
             print(msg)
 

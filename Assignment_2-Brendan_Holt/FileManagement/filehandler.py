@@ -45,40 +45,6 @@ class FileHandler(IFileHandler):
         the_file.write(string)
         the_file.close()
 
-    # validate input for date type
-    # KATE
-    def valid_date(self, birthday):
-        minyear = 1000
-        maxyear = date.today().year
-
-        mydate = birthday.split('-')
-        if len(mydate) == 3:
-            birthdate = mydate[0]
-            birthmonth = mydate[1]
-            birthyear = mydate[2]
-            print(birthyear)
-
-            if int(birthyear) > maxyear or int(birthyear) < minyear:
-                print(mydate)
-                birthdayobj = date(birthdate, birthmonth, birthyear)
-                return True
-            else:
-                print('Year is out of range')
-
-    # Validate date match year
-    # KATE
-
-    def valid_age(self, birthday):
-        today = date.today()
-        mydate = birthday
-        print(mydate)
-        try:
-            born = datetime.strptime(mydate, '%d%m%Y')
-        except ValueError:
-            pass
-        else:
-            age = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-            return age
 
     # Validate file data
 
@@ -103,7 +69,7 @@ class FileHandler(IFileHandler):
             self.valid = True
             print(person)
             # check the format is a letter and 3 digit e.g A002 or a002
-            if re.match(r'[a-z][0-9]{3}', (person[0]).lower()):
+            if re.match(r'[a-z][0-9]{2}', person[0].lower()):
                 # Kris
                 if len(str(person[0])) >= 5:
                     self.valid = False
@@ -124,6 +90,7 @@ class FileHandler(IFileHandler):
             # CHECK DATE, THEN CHECK AGE..
             # Kris
             date_correct = True
+
             try:
                 datetime.strptime(person[6], "%d-%m-%Y")
             except ValueError:
@@ -140,8 +107,9 @@ class FileHandler(IFileHandler):
                     self.valid = False
                     feedback += "Age and birthday does not match. " + str(test_age) + ":" + str(int(person[2]))
 
-            # check sales is 3 interger value
-            if re.match(r'[0-9]{3}', person[3]):
+            # check sales is an interger value
+            salarylength = len(person[3])
+            if re.match(r'^[0-9]{2,3}$', person[3]):
                 print(person[3])
             else:
                 feedback += "Incorrect sales number; must be a 3 digit whole number. \n"
@@ -156,6 +124,7 @@ class FileHandler(IFileHandler):
 
             # check Income is float
             try:
+
                 if int(person[5]):
                     if len(str(int(person[5]))) > 3:
                         feedback += "Income is too large."
@@ -180,23 +149,24 @@ class FileHandler(IFileHandler):
     # Brendan Holt
     # Used to pickle the loaded graphs to default pickle file
     def pack_pickle(self, graphs):
-        # Raises exception if the default file does not exits and creates it should this exception be raised
+        # Raises exception if for some reason the default folder has been deleted
         try:
-            realfilepath = os.path.dirname(os.path.realpath(sys.argv[0])) + "\\files\\pickle.dat"
-            if not os.path.exists(realfilepath):
+            realfiledirectory = os.path.dirname(os.path.realpath(sys.argv[0])) + "\\files\\"
+            if not os.path.exists(realfiledirectory):
                 raise IOError
         except IOError:
-            os.makedirs(os.path.dirname(realfilepath))
+            print("Directory Created")
+            os.makedirs(os.path.dirname(realfiledirectory))
             pass
         # The pickle process
-        pickleout = open(realfilepath, "wb")
+        pickleout = open(realfiledirectory + "\\pickle.dat", "wb")
         pickle.dump(graphs, pickleout)
         pickleout.close()
 
     # Brendan Holt
     # Used to unpickle graphs in the pickle file and return them to the interpreters graph list
     def unpack_pickle(self, filepath):
-        # Raises exception if for some reason the default file has been deleted
+        # Raises exception if for some reason the file does not exist
         try:
             if os.path.exists(filepath) is False:
                 raise IOError
@@ -219,6 +189,7 @@ class FileHandler(IFileHandler):
             if os.path.exists(realfiledirectory) is False:
                 raise IOError
         except IOError:
+            print('Directory Created')
             os.makedirs(os.path.dirname(realfiledirectory))
             return
         # The pickle process
