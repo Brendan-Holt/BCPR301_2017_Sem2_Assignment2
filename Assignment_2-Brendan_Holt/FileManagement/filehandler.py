@@ -47,6 +47,85 @@ class FileHandler(IFileHandler):
 
 
     # Validate file data
+    def validate_format(self, person, feedback):
+        validationcondition = True
+        # check the format is a letter and 3 digit e.g A002 or a002
+        if re.match(r'[a-z][0-9]{2}', person[0].lower()):
+            # Kris
+            if len(str(person[0])) >= 5:
+                validationcondition = False
+        else:
+            # Kris
+            feedback += "ID is incorrect; must contain a letter and 3 digits e.g. a001.\n"
+            validationcondition = False
+        return validationcondition
+
+    def validate_gender(self, person, feedback):
+        validationcondition = True
+        if person[1].upper() == "M" or (person[1]).upper() == "F":
+            print(person[1])
+        else:
+            # Kris
+            feedback += "Incorect Gender; must be M or F.\n"
+            validationcondition = False
+        return validationcondition
+
+    def validate_age(self, person, feedback):
+        validationcondition = True
+        date_correct = True
+
+        try:
+            datetime.strptime(person[6], "%d-%m-%Y")
+        except ValueError:
+            date_correct = False
+            feedback += "Date is not corrent format! " + str(person[6])
+            validationcondition = False
+
+        if date_correct:
+            the_date = datetime.strptime(person[6], "%d-%m-%Y")
+            test_age = math.floor(((datetime.today() - the_date).days / 365))
+            if test_age == int(person[2]):
+                pass
+            else:
+                validationcondition = False
+                feedback += "Age and birthday does not match. " + str(test_age) + ":" + str(int(person[2]))
+        return validationcondition
+
+    def validate_sales(self, person, feedback):
+        validationcondition = True
+        if re.match(r'^[0-9]{2,3}$', person[3]):
+            print("ccc " + person[3])
+        else:
+            feedback += "Incorrect sales number; must be a 3 digit whole number. \n"
+            validationcondition = False
+        return validationcondition
+
+    def validate_bmi(self, person, feedback):
+        validationcondition = True
+        if re.match(r'\b(NORMAL|OVERWEIGHT|OBESITY|UNDERWEIGHT)\b', (person[4]).upper()):
+            print(person[4])
+        else:
+            feedback += "Incorrect BMI value; Choose from Normal, Overweight, Obesity or Underweight. \n"
+            validationcondition = False
+        return validationcondition
+
+    def validate_income(self, person, feedback):
+        validationcondition = True
+        # check Income is float
+        try:
+
+            if int(person[5]):
+                if len(str(int(person[5]))) > 3:
+                    feedback += "Income is too large."
+                    validationcondition = False
+                else:
+                    pass
+            else:
+                feedback += "Incorrect income; must be an integer number. \n" + str(person[5])
+                validationcondition = False
+        except ValueError:
+            validationcondition = False
+        return validationcondition
 
     def validate(self, data):
         """ TestCase for validate
@@ -65,84 +144,26 @@ class FileHandler(IFileHandler):
         feedback = ""
         for person in data:
             feedback += "Feedback for data at: " + str(data.index(person) + 1) + "\n"
-
             self.valid = True
             print(person)
             # check the format is a letter and 3 digit e.g A002 or a002
-            if re.match(r'[a-z][0-9]{2}', person[0].lower()):
-                # Kris
-                if len(str(person[0])) >= 5:
-                    self.valid = False
-            else:
-                # Kris
-                feedback += "ID is incorrect; must contain a letter and 3 digits e.g. a001.\n"
-                self.valid = False
-
+            self.valid = self.validate_format(person, feedback)
             # check the format is either M/F/Male/Female
-
-            if person[1].upper() == "M" or (person[1]).upper() == "F":
-                print(person[1])
-            else:
-                # Kris
-                feedback += "Incorect Gender; must be M or F.\n"
-                self.valid = False
-
-            # CHECK DATE, THEN CHECK AGE..
-            # Kris
-            date_correct = True
-
-            try:
-                datetime.strptime(person[6], "%d-%m-%Y")
-            except ValueError:
-                date_correct = False
-                feedback += "Date is not corrent format! " + str(person[6])
-                self.valid = False
-
-            if date_correct:
-                the_date = datetime.strptime(person[6], "%d-%m-%Y")
-                test_age = math.floor(((datetime.today() - the_date).days/365))
-                if test_age == int(person[2]):
-                    pass
-                else:
-                    self.valid = False
-                    feedback += "Age and birthday does not match. " + str(test_age) + ":" + str(int(person[2]))
-
-            # check sales is an interger value
-            salarylength = len(person[3])
-            if re.match(r'^[0-9]{2,3}$', person[3]):
-                print(person[3])
-            else:
-                feedback += "Incorrect sales number; must be a 3 digit whole number. \n"
-                self.valid = False
-
-            # check BMI is either Normal / Overweight / Obesity or Underweight
-            if re.match(r'\b(NORMAL|OVERWEIGHT|OBESITY|UNDERWEIGHT)\b', (person[4]).upper()):
-                print(person[4])
-            else:
-                feedback += "Incorrect BMI value; Choose from Normal, Overweight, Obesity or Underweight. \n"
-                self.valid = False
-
-            # check Income is float
-            try:
-
-                if int(person[5]):
-                    if len(str(int(person[5]))) > 3:
-                        feedback += "Income is too large."
-                        self.valid = False
-                    else:
-                        pass
-                else:
-                    feedback += "Incorrect income; must be an integer number. \n" + str(person[5])
-                    self.valid = False
-            except ValueError:
-                self.valid = False
-
+            if self.valid:
+                self.valid = self.validate_gender(person, feedback)
+            if self.valid:
+                self.valid = self.validate_age(person, feedback)
+            if self.valid:
+                self.valid = self.validate_sales(person, feedback)
+            if self.valid:
+                self.valid = self.validate_bmi(person, feedback)
+            if self.valid:
+                self.valid = self.validate_income(person, feedback)
             if self.valid:
                 add_to.append(person)
                 feedback += "Passed and added to database.\n"
             else:
                 feedback += '\n\n'
-
         print(feedback)
         return add_to
 
